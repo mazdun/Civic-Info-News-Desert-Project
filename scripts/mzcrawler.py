@@ -28,7 +28,7 @@ import hashlib
 from storysniffer import StorySniffer
 import ast
 from newspaper import Article
-import nltk
+#import nltk
 
 #Whole Script
 
@@ -101,11 +101,36 @@ if __name__ == "__main__":
     sniffer = StorySniffer()
 
     for u in internal_urls:
+    #URLs that are likely not news articles and that slip through the storysniffer:
         try:
+            if ".pdf" in u: 
+                continue
+            if "/event" in u: 
+                continue
+            if "/classifieds" in u:
+                continue
+            if "/special_sections" in u:
+                continue
+            if "/form" in u:
+                continue
+            if "/edition" in u:
+                continue
+            if "/archive" in u:
+                continue
+            if "/feed" in u:
+                continue
+            if "gallery" in u:
+                continue
             if sniffer.guess(u) == True:
                 valid_urls.append(u)
 
         except BaseException as e:
+            pass
+        except SSLError:
+            pass
+        except MaxRetryError:
+            pass
+        except SSLCertVerificationError:
             pass
 
     news_data = []
@@ -119,8 +144,9 @@ if __name__ == "__main__":
             'text': crawl(u),
             'host': urllib.parse.urlsplit(u).hostname
         })
-print(news_data[0])
 
-    #with open('{}_{}.json'.format(get_host(url), str(datetime.now())), 'w') as f:
-        #json.dump(news_data, f, indent=4, ensure_ascii=True)
+    with open('{}_{}.json'.format(get_host(url), str(datetime.now())), 'w') as f:
+        json.dump(news_data, f, indent=4, ensure_ascii=True)
+        
+print('done')
 
